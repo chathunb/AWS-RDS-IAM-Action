@@ -50,11 +50,9 @@ jobs:
           wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
           psql "host=$RDSHOST port=5432 dbname=identitydb user=stg-identity-user password=$PGPASSWORD" sslrootcert=global-bundle.pem -c "SELECT * FROM  pg_catalog.pg_tables "
           echo $RDSHOST
-           
-      - name: Set Environment Variables
         env:
           IDENTITY_POSTGRES_PASSWORD: $PGPASSWORD
-          
+        
       - name: Test
         run: |
          echo ${{env.IDENTITY_POSTGRES_PASSWORD}}
