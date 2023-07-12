@@ -54,7 +54,7 @@ jobs:
           
       - name: Set Environment Variables
         env:
-          IDENTITY_POSTGRES_PASSWORD:  $PGPASSWORD
+          IDENTITY_POSTGRES_PASSWORD:  echo $PGPASSWORD
         run: |
          echo ${{env.IDENTITY_POSTGRES_PASSWORD}}
          echo $IDENTITY_POSTGRES_PASSWORD
