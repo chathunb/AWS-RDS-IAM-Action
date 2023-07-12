@@ -48,4 +48,4 @@ jobs:
           export RDSHOST="stg-v2-primary-db-proxy-iam-2.proxy-ce9bljj6mci9.us-east-1.rds.amazonaws.com"
           export PGPASSWORD="$(aws rds generate-db-auth-token --hostname $RDSHOST --port 5432 --region us-east-1 --username stg-identity-user )"
           wget https://truststore.pki.rds.amazonaws.com/global/global-bundle.pem
-          psql "host=$RDSHOST port=5432 dbname=identitydb user=stg-identity-user password=$PGPASSWORD" sslrootcert=global-bundle.pem
+          psql "host=$RDSHOST port=5432 dbname=identitydb user=stg-identity-user password=$PGPASSWORD" sslrootcert=global-bundle.pem -c "SELECT * FROM table_name"
