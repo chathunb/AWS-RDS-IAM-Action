@@ -52,7 +52,7 @@ jobs:
           echo $RDSHOST
           echo $PGPASSWORD
         env: |
-          IDENTITY_POSTGRES_PASSWORD: fooo
+          IDENTITY_POSTGRES_PASSWORD: "fooo"
          
           
       - name: Set Environment Variables
