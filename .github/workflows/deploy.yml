@@ -51,14 +51,13 @@ jobs:
           psql "host=$RDSHOST port=5432 dbname=identitydb user=stg-identity-user password=$PGPASSWORD" sslrootcert=global-bundle.pem -c "SELECT * FROM  pg_catalog.pg_tables "
           echo $RDSHOST
           echo $PGPASSWORD
-        env: |
-          IDENTITY_POSTGRES_PASSWORD: "fooo"
-         
-          
+  
+
       - name: Set Environment Variables
         env:
-          IDENTITY_POSTGRES_PASSWORD:  echo $PGPASSWORD
+          IDENTITY_POSTGRES_PASSWORD:  "foo"
         run: |
          echo ${{env.IDENTITY_POSTGRES_PASSWORD}}
          echo $IDENTITY_POSTGRES_PASSWORD
+         echo $PGPASSWORD
         
