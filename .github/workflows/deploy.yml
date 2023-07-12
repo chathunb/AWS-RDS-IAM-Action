@@ -58,8 +58,6 @@ jobs:
           echo ${{env.IDENTITY_POSTGRES_PASSWORD}}
 
       - name: Set Environment Variables
-        env:
-          IDENTITY_POSTGRES_PASSWORD:  "foo"
         run: |
          echo ${{env.IDENTITY_POSTGRES_PASSWORD}}
          echo $IDENTITY_POSTGRES_PASSWORD
