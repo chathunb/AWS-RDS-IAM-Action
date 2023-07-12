@@ -1,16 +1,50 @@
-name: Deploy identity
+name: AWS RDS Proxy IAM Database Connect
 
 on:
   push:
     branches:
       - main
-      
-  workflow_dispatch:
 
 env:
-  AWS_REGION: us-east-1
-  IDENTITY_POSTGRES_WRITE_HOST: ${{secrets.STG_IDENTITY_POSTGRES_WRITE_HOST}}
-  IDENTITY_POSTGRES_PORT: 5432
-  IDENTITY_POSTGRES_USER: ${{secrets.STG_IDENTITY_POSTGRES_USER}}
-  IDENTITY_POSTGRES_PASSWORD: ${{ secrets.IDENTITY_POSTGRES_PASSWORD }}
-  IDENTITY_POSTGRES_DB: identitydb
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        
+      - name: Install OpenVPN
+        run: |
+          sudo apt-get update
+          sudo apt-get --assume-yes --no-install-recommends install openvpn
+
+      - name: Save VPN Config
+        run: echo "${{ secrets.STG_VPN_CONFIG }}" >> /tmp/config.ovpn
+
+      - name: start VPN
+        run: sudo openvpn --config /tmp/config.ovpn --log "/var/log/vpn.log" --daemon
+
+      - name: Wait for a VPN connection
+        timeout-minutes: 2
+        run: until ping -c1 ${{secrets.STG_JUMP_IP}}; do sleep 2; done
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Set up PostgreSQL
+        run: |
+          sudo apt-get update
+          sudo apt-get install postgresql -y
+
+      - name: Connect to PostgreSQL
+        run: |
+          export RDSHOST="stg-v2-primary-db-proxy-iam-2.proxy-ce9bljj6mci9.us-east-1.rds.amazonaws.com"
+          export PGPASSWORD="$(aws rds generate-db-auth-token --hostname $RDSHOST --port 5432 --region us-east-1 --username stg-identity-user )"
+          psql -h <hostname> -p <port> -U <username> -d <database> -c "SELECT * FROM table_name"
