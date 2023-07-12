@@ -8,6 +8,7 @@ on:
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   IDENTITY_POSTGRES_PASSWORD: "default"
+  RDSHOST: "stg-v2-primary-db-proxy-iam-2.proxy-ce9bljj6mci9.us-east-1.rds.amazonaws.com"
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -44,6 +45,8 @@ jobs:
           sudo apt-get install postgresql -y
 
       - name: Connect to PostgreSQL
+        env:
+          IDENTITY_POSTGRES_PASSWORD:  "$(aws rds generate-db-auth-token --hostname ${{ env.RDSHOST }} --port 5432 --region us-east-1 --username stg-identity-user )"
         run: |
           export RDSHOST="stg-v2-primary-db-proxy-iam-2.proxy-ce9bljj6mci9.us-east-1.rds.amazonaws.com"
           export PGPASSWORD="$(aws rds generate-db-auth-token --hostname $RDSHOST --port 5432 --region us-east-1 --username stg-identity-user )"
@@ -51,7 +54,8 @@ jobs:
           psql "host=$RDSHOST port=5432 dbname=identitydb user=stg-identity-user password=$PGPASSWORD" sslrootcert=global-bundle.pem -c "SELECT * FROM  pg_catalog.pg_tables "
           echo $RDSHOST
           echo $PGPASSWORD
-  
+          echo "grrrr"
+          echo ${{env.IDENTITY_POSTGRES_PASSWORD}}
 
       - name: Set Environment Variables
         env:
