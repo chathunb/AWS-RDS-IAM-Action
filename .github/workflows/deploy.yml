@@ -1,0 +1,16 @@
+name: Deploy identity
+
+on:
+  push:
+    branches:
+      - main
+      
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  IDENTITY_POSTGRES_WRITE_HOST: ${{secrets.STG_IDENTITY_POSTGRES_WRITE_HOST}}
+  IDENTITY_POSTGRES_PORT: 5432
+  IDENTITY_POSTGRES_USER: ${{secrets.STG_IDENTITY_POSTGRES_USER}}
+  IDENTITY_POSTGRES_PASSWORD: ${{ secrets.IDENTITY_POSTGRES_PASSWORD }}
+  IDENTITY_POSTGRES_DB: identitydb
